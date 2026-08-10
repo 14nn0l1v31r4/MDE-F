@@ -4,7 +4,7 @@ import type { AnalysisResult } from "../types";
 import {
   downloadChartAsPng,
   downloadAllChartsAsZip,
-} from "../utils/chartExport";
+} from "../utils/ChartExport";
 
 function getAnalysisTitle(analysisType: string): string {
   const titles: Record<string, string> = {
