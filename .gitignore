@@ -1,0 +1,30 @@
+# ==============================================================================
+# 3. FRONTEND (Vite / React / Node)
+# ==============================================================================
+# Ignora a pasta gigante de dependências do front
+frontend/node_modules/
+node_modules/
+
+# Pastas de build/distribuição (arquivos gerados para produção)
+frontend/dist/
+frontend/build/
+dist/
+build/
+
+# Logs de erro do ecossistema Node
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+
+# ==============================================================================
+# 4. FERRAMENTAS E SISTEMA OPERACIONAL
+# ==============================================================================
+# Arquivos de configuração de IDEs
+.vscode/
+.idea/
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+desktop.ini
