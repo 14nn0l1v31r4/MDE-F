@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "http://147.15.86.108/mining/api/:path*"
+    }
+  ]
+}
