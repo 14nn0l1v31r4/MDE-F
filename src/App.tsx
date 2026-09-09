@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { listDatasets } from "./api/client";
+import { useAuth } from "./auth/AuthContext";
 import { AnalysisPanel } from "./components/AnalysisPanel";
 import { DatasetPreview } from "./components/DatasetPreview";
 import { FileUpload } from "./components/FileUpload";
+import { LoginPage } from "./components/LoginPage";
 import { ResultViewer } from "./components/ResultViewer";
 import { Sidebar } from "./components/Sidebar";
 import { UserGuide } from "./components/UserGuide";
@@ -12,14 +14,24 @@ import "./styles.css";
 type AppPage = "home" | "guide";
 
 export default function App() {
+  const { status } = useAuth();
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [currentPage, setCurrentPage] = useState<AppPage>("home");
 
   useEffect(() => {
+    if (status !== "authenticated") return;
     listDatasets().then(setDatasets).catch(() => setDatasets([]));
-  }, []);
+  }, [status]);
+
+  if (status === "restoring") {
+    return <main className="auth-loading">Carregando sessão...</main>;
+  }
+
+  if (status === "anonymous") {
+    return <LoginPage />;
+  }
 
   function scrollToSection(sectionId: string) {
     window.setTimeout(() => {
