@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { clearAccessToken, readAccessToken, writeAccessToken } from "./storage";
+import { clearAccessToken, readAccessToken, writeAccessToken } from "../auth/storage";
 
 describe("auth storage", () => {
   beforeEach(() => sessionStorage.clear());

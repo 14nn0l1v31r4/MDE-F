@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUser, login as loginRequest, register as registerRequest } from "../api/client";
 import { AuthProvider } from "../auth/AuthContext";
-import { RegisterPage } from "./RegisterPage";
+import { RegisterPage } from "../components/RegisterPage";
 
 vi.mock("../api/client", () => ({
   getCurrentUser: vi.fn(),

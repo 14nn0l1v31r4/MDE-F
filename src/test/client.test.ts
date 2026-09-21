@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getCurrentUser, login, register } from "./client";
+import { getCurrentUser, login, register } from "../api/client";
 import { readAccessToken, writeAccessToken } from "../auth/storage";
 
 describe("authenticated API client", () => {

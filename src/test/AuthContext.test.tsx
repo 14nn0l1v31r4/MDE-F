@@ -2,8 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getCurrentUser, login as loginRequest, register as registerRequest } from "../api/client";
-import { readAccessToken, writeAccessToken } from "./storage";
-import { AuthProvider, useAuth } from "./AuthContext";
+import { readAccessToken, writeAccessToken } from "../auth/storage";
+import { AuthProvider, useAuth } from "../auth/AuthContext";
 
 vi.mock("../api/client", () => ({
   getCurrentUser: vi.fn(),
