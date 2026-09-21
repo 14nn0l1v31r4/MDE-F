@@ -1,20 +1,30 @@
 import { useState, type FormEvent } from "react";
 import { useAuth } from "../auth/AuthContext";
 
-export function LoginPage() {
-  const { error, login, status } = useAuth();
+type LoginPageProps = {
+  onNavigateRegister?: () => void;
+};
+
+export function LoginPage({ onNavigateRegister }: LoginPageProps = {}) {
+  const { error, login, status, clearError } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const isSubmitting = status === "restoring";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    clearError?.();
 
     try {
       await login(email.trim(), password);
     } catch {
       // AuthProvider exposes the API error through context.
     }
+  }
+
+  function handleNavigateRegister() {
+    clearError?.();
+    onNavigateRegister?.();
   }
 
   return (
@@ -59,6 +69,17 @@ export function LoginPage() {
             {isSubmitting ? "Entrando..." : "Entrar"}
           </button>
         </form>
+
+        <div className="auth-footer-nav">
+          <span>Não possui uma conta?</span>{" "}
+          <button
+            type="button"
+            className="auth-link-button"
+            onClick={handleNavigateRegister}
+          >
+            Cadastre-se
+          </button>
+        </div>
 
         {error && (
           <p className="feedback-message error auth-error" role="alert" aria-live="polite">

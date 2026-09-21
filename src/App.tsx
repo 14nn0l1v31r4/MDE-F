@@ -5,6 +5,7 @@ import { AnalysisPanel } from "./components/AnalysisPanel";
 import { DatasetPreview } from "./components/DatasetPreview";
 import { FileUpload } from "./components/FileUpload";
 import { LoginPage } from "./components/LoginPage";
+import { RegisterPage } from "./components/RegisterPage";
 import { ResultViewer } from "./components/ResultViewer";
 import { Sidebar } from "./components/Sidebar";
 import { UserGuide } from "./components/UserGuide";
@@ -15,6 +16,7 @@ type AppPage = "home" | "guide";
 
 export default function App() {
   const { status } = useAuth();
+  const [authView, setAuthView] = useState<"login" | "register">("login");
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [selectedDataset, setSelectedDataset] = useState<Dataset | null>(null);
   const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -30,7 +32,11 @@ export default function App() {
   }
 
   if (status === "anonymous") {
-    return <LoginPage />;
+    return authView === "register" ? (
+      <RegisterPage onNavigateLogin={() => setAuthView("login")} />
+    ) : (
+      <LoginPage onNavigateRegister={() => setAuthView("register")} />
+    );
   }
 
   function scrollToSection(sectionId: string) {

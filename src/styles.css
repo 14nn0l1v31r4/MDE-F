@@ -1725,6 +1725,67 @@ details[open] {
   margin-bottom: 0;
 }
 
+.auth-footer-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 18px;
+  font-size: 0.92rem;
+  color: var(--color-muted);
+}
+
+.auth-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primary);
+  font-weight: 700;
+  font-size: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
+}
+
+.auth-link-button:hover {
+  color: var(--color-primary-dark);
+}
+
+.password-rules-list {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.82rem;
+}
+
+.password-rules-list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.15s ease;
+}
+
+.rule-met {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.rule-met::before {
+  content: "✓";
+  font-weight: 700;
+}
+
+.rule-unmet {
+  color: var(--color-muted);
+}
+
+.rule-unmet::before {
+  content: "•";
+}
+
 .auth-loading {
   display: grid;
   min-height: 100vh;
