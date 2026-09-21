@@ -1,14 +1,47 @@
-import type { AnalysisResult, Dataset, DatasetPreview } from "../types";
+import type { AnalysisResult, Dataset, DatasetPreview, TokenResponse, User } from "../types";
+import { clearAccessToken, readAccessToken } from "../auth/storage";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
+
+function createHeaders(input?: HeadersInit): Record<string, string> {
+  return Object.fromEntries(new Headers(input).entries());
+}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, options);
+  const token = readAccessToken();
+  const headers = createHeaders(options?.headers);
+
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers,
+  });
+
   if (!response.ok) {
+    if (response.status === 401 && token) {
+      clearAccessToken();
+      window.dispatchEvent(new Event("auth:unauthorized"));
+    }
+
     const error = await response.json().catch(() => ({ detail: "Erro desconhecido" }));
     throw new Error(error.detail ?? "Erro na requisição");
   }
   return response.json();
+}
+
+export async function login(email: string, password: string): Promise<TokenResponse> {
+  return request<TokenResponse>("/auth/login/json", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function getCurrentUser(): Promise<User> {
+  return request<User>("/auth/me");
 }
 
 export async function uploadDataset(file: File): Promise<Dataset> {

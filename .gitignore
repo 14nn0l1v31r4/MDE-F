@@ -31,3 +31,6 @@ desktop.ini
 
 .env
 .env.*
+
+# Documentação de planejamento local
+docs/

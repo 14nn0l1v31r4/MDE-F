@@ -1,3 +1,5 @@
+import { useAuth } from "../auth/AuthContext";
+
 type SidebarProps = {
   currentPage: "home" | "guide";
   onNavigate: (sectionId: string) => void;
@@ -9,6 +11,7 @@ export function Sidebar({
   onNavigate,
   onOpenGuide,
 }: SidebarProps) {
+  const { logout, user } = useAuth();
   const links = [
     { href: "#inicio", label: "Início", sectionId: "inicio" },
     {
@@ -71,7 +74,15 @@ export function Sidebar({
         </a>
       </nav>
 
-      
+      {user && (
+        <div className="sidebar-account">
+          <strong>{user.full_name}</strong>
+          <span>{user.email}</span>
+          <button type="button" className="sidebar-logout" onClick={logout}>
+            Sair
+          </button>
+        </div>
+      )}
     </aside>
   );
 }
