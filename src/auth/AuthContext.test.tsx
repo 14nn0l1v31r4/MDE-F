@@ -1,13 +1,14 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { getCurrentUser, login as loginRequest } from "../api/client";
+import { getCurrentUser, login as loginRequest, register as registerRequest } from "../api/client";
 import { readAccessToken, writeAccessToken } from "./storage";
 import { AuthProvider, useAuth } from "./AuthContext";
 
 vi.mock("../api/client", () => ({
   getCurrentUser: vi.fn(),
   login: vi.fn(),
+  register: vi.fn(),
 }));
 
 const user = {
@@ -28,6 +29,20 @@ function Harness() {
       <span>{auth.user?.full_name}</span>
       <span>{auth.error}</span>
       <button type="button" onClick={() => void auth.login(user.email, "Secret123!")}>Login</button>
+      <button
+        type="button"
+        onClick={() =>
+          void auth
+            .register({
+              email: "novo@example.com",
+              password: "Password123!",
+              full_name: "Novo Usuário",
+            })
+            .catch(() => {})
+        }
+      >
+        Register
+      </button>
       <button type="button" onClick={auth.logout}>Logout</button>
     </div>
   );
@@ -93,6 +108,43 @@ describe("AuthProvider", () => {
     await userEvent.setup().click(screen.getByRole("button", { name: "Logout" }));
 
     expect(screen.getByText("anonymous")).toBeInTheDocument();
+    expect(readAccessToken()).toBeNull();
+  });
+
+  it("registers user and automatically logs in", async () => {
+    const newUser = {
+      id: "2",
+      email: "novo@example.com",
+      full_name: "Novo Usuário",
+      role: "analyst",
+      is_active: true,
+      created_at: null,
+    };
+    vi.mocked(registerRequest).mockResolvedValue(newUser);
+    vi.mocked(loginRequest).mockResolvedValue({ access_token: "new-jwt", token_type: "bearer" });
+    vi.mocked(getCurrentUser).mockResolvedValue(newUser);
+
+    renderAuth();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Register" }));
+
+    await waitFor(() => expect(screen.getByText("authenticated")).toBeInTheDocument());
+    expect(registerRequest).toHaveBeenCalledWith({
+      email: "novo@example.com",
+      password: "Password123!",
+      full_name: "Novo Usuário",
+    });
+    expect(loginRequest).toHaveBeenCalledWith("novo@example.com", "Password123!");
+    expect(readAccessToken()).toBe("new-jwt");
+    expect(screen.getByText("Novo Usuário")).toBeInTheDocument();
+  });
+
+  it("handles registration error and sets error message", async () => {
+    vi.mocked(registerRequest).mockRejectedValue(new Error("Usuário já existe"));
+
+    renderAuth();
+    await userEvent.setup().click(screen.getByRole("button", { name: "Register" }));
+
+    await waitFor(() => expect(screen.getByText("Usuário já existe")).toBeInTheDocument());
     expect(readAccessToken()).toBeNull();
   });
 });

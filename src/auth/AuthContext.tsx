@@ -7,8 +7,8 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import { getCurrentUser, login as loginRequest } from "../api/client";
-import type { User } from "../types";
+import { getCurrentUser, login as loginRequest, register as registerRequest } from "../api/client";
+import type { RegisterData, User } from "../types";
 import { clearAccessToken, readAccessToken, writeAccessToken } from "./storage";
 
 type AuthStatus = "restoring" | "authenticated" | "anonymous";
@@ -18,7 +18,9 @@ type AuthContextValue = {
   user: User | null;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
   logout: () => void;
+  clearError: () => void;
 };
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -94,6 +96,26 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }, []);
 
+  const register = useCallback(async (data: RegisterData) => {
+    setError(null);
+    setStatus("restoring");
+
+    try {
+      await registerRequest(data);
+      const token = await loginRequest(data.email, data.password);
+      writeAccessToken(token.access_token);
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      setStatus("authenticated");
+    } catch (regError) {
+      clearAccessToken();
+      setUser(null);
+      setStatus("anonymous");
+      setError(errorMessage(regError));
+      throw regError;
+    }
+  }, []);
+
   const logout = useCallback(() => {
     clearAccessToken();
     setUser(null);
@@ -101,9 +123,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setStatus("anonymous");
   }, []);
 
+  const clearError = useCallback(() => {
+    setError(null);
+  }, []);
+
   const value = useMemo(
-    () => ({ status, user, error, login, logout }),
-    [status, user, error, login, logout],
+    () => ({ status, user, error, login, register, logout, clearError }),
+    [status, user, error, login, register, logout, clearError],
   );
 
   return <AuthContext value={value}>{children}</AuthContext>;
