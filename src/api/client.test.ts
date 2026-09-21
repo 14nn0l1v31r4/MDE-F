@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getCurrentUser, login } from "./client";
+import { getCurrentUser, login, register } from "./client";
 import { readAccessToken, writeAccessToken } from "../auth/storage";
 
 describe("authenticated API client", () => {
@@ -78,5 +78,45 @@ describe("authenticated API client", () => {
     expect(readAccessToken()).toBeNull();
     expect(unauthorized).toHaveBeenCalledTimes(1);
     window.removeEventListener("auth:unauthorized", unauthorized);
+  });
+
+  it("sends register request with correct payload and returns created user", async () => {
+    const newUser = {
+      id: "user-1",
+      email: "novo@example.com",
+      full_name: "Novo Usuário",
+      role: "analyst",
+      is_active: true,
+      created_at: null,
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(JSON.stringify(newUser), {
+          status: 201,
+          headers: { "Content-Type": "application/json" },
+        }),
+      ),
+    );
+
+    const response = await register({
+      email: "novo@example.com",
+      password: "Password123!",
+      full_name: "Novo Usuário",
+    });
+
+    expect(fetch).toHaveBeenCalledWith(
+      "/api/auth/register",
+      expect.objectContaining({
+        method: "POST",
+        headers: expect.objectContaining({ "content-type": "application/json" }),
+        body: JSON.stringify({
+          email: "novo@example.com",
+          password: "Password123!",
+          full_name: "Novo Usuário",
+        }),
+      }),
+    );
+    expect(response).toEqual(newUser);
   });
 });

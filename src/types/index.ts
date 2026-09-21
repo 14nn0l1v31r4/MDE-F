@@ -20,6 +20,12 @@ export type TokenResponse = {
   token_type: string;
 };
 
+export type RegisterData = {
+  email: string;
+  password: string;
+  full_name: string;
+};
+
 export type DatasetPreview = {
   dataset_id: string;
   columns: string[];

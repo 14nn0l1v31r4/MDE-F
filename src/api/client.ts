@@ -1,4 +1,11 @@
-import type { AnalysisResult, Dataset, DatasetPreview, TokenResponse, User } from "../types";
+import type {
+  AnalysisResult,
+  Dataset,
+  DatasetPreview,
+  RegisterData,
+  TokenResponse,
+  User,
+} from "../types";
 import { clearAccessToken, readAccessToken } from "../auth/storage";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
@@ -37,6 +44,14 @@ export async function login(email: string, password: string): Promise<TokenRespo
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function register(data: RegisterData): Promise<User> {
+  return request<User>("/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
   });
 }
 
